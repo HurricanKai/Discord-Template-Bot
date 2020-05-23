@@ -1,8 +1,11 @@
 #!/bin/bash
 # !! Run this script from the build directory !!
 
+cd ../*.Bot || echo 'ERROR: Could not find .Bot project.'
+NAME=""$(jq '.Build.DockerName' botSettings.json)
+
+cd .. || echo 'ERROR: Dockerfile not found.'
 FILE=../Dockerfile
-NAME="template"
 
 echo 'Trying to find Dockerfile'
 if [ -f "$FILE" ]; 
@@ -14,17 +17,17 @@ if [ -f "$FILE" ];
     exit
 fi
 
-if [ "$(docker ps -f name=$NAME)" ];
+if [ "$(docker ps -f name="$NAME")" ];
   then 
     echo 'Stopping Docker container.'
-    docker container stop $NAME
+    docker container stop "$NAME"
     
     echo 'Removing Docker container.'
-    docker container rm $NAME
+    docker container rm "$NAME"
 fi
 
 echo 'Building Docker image.'
-docker build -t $NAME -f ./Dockerfile .
+docker build -t "$NAME" -f ./Dockerfile .
 
 echo 'Running Docker process in a container.'
-docker run --network host --restart on-failure:5 --name $NAME -d $NAME
+docker run --network host --restart on-failure:5 --name "$NAME" -d "$NAME"
