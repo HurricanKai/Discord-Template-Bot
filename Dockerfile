@@ -17,4 +17,4 @@ FROM mcr.microsoft.com/dotnet/core/runtime:3.1 AS runtime
 WORKDIR /app
 COPY --from=build /app/out ./
 
-ENTRYPOINT ["dotnet", "Template.dll"]
+ENTRYPOINT ["dotnet", "Template.Bot.dll"]
