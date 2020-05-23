@@ -1,0 +1,10 @@
+﻿{
+  "Discord": {
+    "Token":"",
+    "Prefix":""
+  },
+
+  "Postgre": {
+    "ConnectionString":""
+  }
+}
