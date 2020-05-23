@@ -44,7 +44,7 @@ namespace Template.Services.Command
             await TryExecute(socketUserMessage, context);
         }
         
-        private async Task TryExecute(IUserMessage message, SocketCommandContext context)
+        private async Task TryExecute(IUserMessage message, ICommandContext context)
         {
             var prefix = _configuration["Discord:Prefix"];
             var argPos = 0; 
@@ -60,9 +60,9 @@ namespace Template.Services.Command
             if (!result.IsSuccess)
             {
                 _logger.Warning("Command Exception: {User} tried to run {Command} but: {Error}", 
-                    context.User.Username ?? "An unknown user", 
-                    commandInfo.Value.Name ?? "an unknown command", 
-                    result.ErrorReason ?? "An unknown reason");
+                    context.User.Username, 
+                    commandInfo.Value.Name, 
+                    result.ErrorReason);
             }
 
             return Task.CompletedTask;
