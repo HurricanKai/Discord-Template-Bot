@@ -5,7 +5,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Serilog;
 
-namespace Template.Services
+namespace Template.Services.Logging
 {
     public class LogHandler
     {

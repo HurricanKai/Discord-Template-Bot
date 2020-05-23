@@ -7,7 +7,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
-namespace Template.Services
+namespace Template.Services.Command
 {
     public class CommandHandler
     {
@@ -47,7 +47,7 @@ namespace Template.Services
         private async Task TryExecute(IUserMessage message, SocketCommandContext context)
         {
             var prefix = _configuration["Discord:Prefix"];
-            var argPos = 00; 
+            var argPos = 0; 
                 
             if (message.HasStringPrefix(prefix, ref argPos))
             {
@@ -61,7 +61,7 @@ namespace Template.Services
             {
                 _logger.Warning("Command Exception: {User} tried to run {Command} but: {Error}", 
                     context.User.Username ?? "An unknown user", 
-                    commandInfo.Value.Name ?? "An unknown command", 
+                    commandInfo.Value.Name ?? "an unknown command", 
                     result.ErrorReason ?? "An unknown reason");
             }
 
