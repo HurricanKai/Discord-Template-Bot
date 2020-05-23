@@ -47,8 +47,8 @@ namespace Template.Services
         private async Task TryExecute(IUserMessage message, SocketCommandContext context)
         {
             var prefix = _configuration["Discord:Prefix"];
-            var argPos = 0;
-            
+            var argPos = 00; 
+                
             if (message.HasStringPrefix(prefix, ref argPos))
             {
                 await _commandService.ExecuteAsync(context, argPos, _serviceProvider);
