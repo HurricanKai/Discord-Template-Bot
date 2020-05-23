@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Reflection;
+using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -7,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
-using Template.Bot;
 using Template.Data;
 using Template.Services;
 
@@ -43,9 +43,9 @@ namespace Template
 
             serviceProvider.GetRequiredService<CommandHandler>();
             serviceProvider.GetRequiredService<LogHandler>();
-
+            
             await serviceProvider.GetRequiredService<StartupService>().StartAsync();
-            await serviceProvider.GetRequiredService<CommandService>().AddModulesAsync(typeof(TemplateBot).Assembly, serviceProvider);
+            await serviceProvider.GetRequiredService<CommandService>().AddModulesAsync(Assembly.GetEntryAssembly(), serviceProvider);
             
             await Task.Delay(-1);
         }

@@ -6,7 +6,6 @@ COPY Template.sln .
 COPY Template.Data/Template.Data.csproj Template.Data/
 COPY Template.Services/Template.Services.csproj Template.Services/
 COPY Template.Bot/Template.Bot.csproj Template.Bot/
-COPY Template/Template.csproj Template/
 
 RUN dotnet restore 
 

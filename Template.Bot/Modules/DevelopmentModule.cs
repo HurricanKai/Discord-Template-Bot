@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Discord.Commands;
 using Template.Data;
 
@@ -24,6 +26,13 @@ namespace Template.Bot.Modules
             {
                 await ReplyAsync("Could not connect to database.");
             }
+        }
+
+        [Command("assemblies")]
+        public async Task Assemblies()
+        {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName.Contains("Template"));
+            await ReplyAsync(string.Join(',', assemblies.Select(x => x.FullName)));
         }
     }
 }

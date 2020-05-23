@@ -59,7 +59,10 @@ namespace Template.Services
         {
             if (!result.IsSuccess)
             {
-                _logger.Warning("Command Exception: {User} tried to run {Command} but: {Error}", context.User.Username, commandInfo.Value.Name, result.ErrorReason);
+                _logger.Warning("Command Exception: {User} tried to run {Command} but: {Error}", 
+                    context.User.Username ?? "An unknown user", 
+                    commandInfo.Value.Name ?? "An unknown command", 
+                    result.ErrorReason ?? "An unknown reason");
             }
 
             return Task.CompletedTask;
