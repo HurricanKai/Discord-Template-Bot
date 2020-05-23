@@ -4,18 +4,7 @@
 cd ../*.Bot || echo 'ERROR: Could not find .Bot project.'
 NAME=$(jq '.Build.DockerName' botSettings.json)
 
-cd .. || echo 'ERROR: Dockerfile not found.'
-FILE=../Dockerfile
-
-echo 'Trying to find Dockerfile'
-if [ -f "$FILE" ]; 
-  then
-    echo 'Found Dockerfile, navigating to directory.'
-    cd ..
-  else
-    echo 'Could not find Dockerfile. Please navigate to the build directory and run this script.' 
-    exit
-fi
+cd .. 
 
 if [ "$(docker ps -f name="$(NAME)")" ];
   then 
