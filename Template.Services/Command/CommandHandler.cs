@@ -5,7 +5,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace Template.Services.Command
 {
@@ -21,7 +21,7 @@ namespace Template.Services.Command
             DiscordSocketClient discordSocketClient, 
             CommandService commandService, 
             IServiceProvider serviceProvider, 
-            IConfiguration configuration, ILogger logger)
+            IConfiguration configuration, ILogger<CommandHandler> logger)
         {
             _discordSocketClient = discordSocketClient;
             _commandService = commandService;
@@ -59,7 +59,7 @@ namespace Template.Services.Command
         {
             if (!result.IsSuccess)
             {
-                _logger.Warning("Command Exception: {User} tried to run {Command} but: {Error}", 
+                _logger.LogWarning("Command Exception: {User} tried to run {Command} but: {Error}", 
                     context.User.Username ?? "An unknown user", 
                     commandInfo.Value.Name ?? "an unknown command", 
                     result.ErrorReason ?? "An unknown reason");

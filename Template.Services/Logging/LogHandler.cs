@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace Template.Services.Logging
 {
@@ -13,7 +13,7 @@ namespace Template.Services.Logging
         private readonly CommandService _commandService;
         private readonly ILogger _logger;
         
-        public LogHandler(DiscordSocketClient discordSocketClient, CommandService commandService, ILogger logger)
+        public LogHandler(DiscordSocketClient discordSocketClient, CommandService commandService, ILogger<LogHandler> logger)
         {
             _discordSocketClient = discordSocketClient;
             _commandService = commandService;
@@ -25,32 +25,18 @@ namespace Template.Services.Logging
         
         public Task OnLogAsync(LogMessage message)
         {
-            switch (message.Severity)
+            var level = message.Severity switch
             {
-                case LogSeverity.Critical:
-                    _logger.Fatal(message.Exception, message.Message ?? "An exception bubbled up: ");
-                    break;
-                
-                case LogSeverity.Debug:
-                    _logger.Debug(message.ToString());
-                    break;
-                
-                case LogSeverity.Warning:
-                    _logger.Warning(message.ToString());
-                    break;
-                
-                case LogSeverity.Error:
-                    _logger.Error(message.Exception, message.Message ?? "An exception bubbled up: ");
-                    break;
-                
-                case LogSeverity.Info:
-                    _logger.Information(message.ToString());
-                    break;
-                
-                case LogSeverity.Verbose:
-                    _logger.Verbose(message.ToString());
-                    break;
-            }
+                LogSeverity.Critical => LogLevel.Critical,
+                LogSeverity.Error => LogLevel.Error,
+                LogSeverity.Warning => LogLevel.Warning,
+                LogSeverity.Info => LogLevel.Information,
+                LogSeverity.Verbose => LogLevel.Trace,
+                LogSeverity.Debug => LogLevel.Debug,
+                _ => throw new ArgumentOutOfRangeException(nameof(message.Severity))
+            };
+            
+            _logger.Log(level, message.Exception, message.Message);
 
             return Task.CompletedTask;
         }
