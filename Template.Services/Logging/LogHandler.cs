@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Template.Services.Logging
 {
-    public class LogHandler
+    public class LogHandler : IHostedService
     {
         private readonly DiscordSocketClient _discordSocketClient;
         private readonly CommandService _commandService;
@@ -18,9 +20,6 @@ namespace Template.Services.Logging
             _discordSocketClient = discordSocketClient;
             _commandService = commandService;
             _logger = logger;
-
-            _discordSocketClient.Log += OnLogAsync;
-            _commandService.Log += OnLogAsync;
         }
         
         public Task OnLogAsync(LogMessage message)
@@ -38,6 +37,22 @@ namespace Template.Services.Logging
             
             _logger.Log(level, message.Exception, message.Message);
 
+            return Task.CompletedTask;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            _discordSocketClient.Log += OnLogAsync;
+            _commandService.Log += OnLogAsync;
+            
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            _discordSocketClient.Log -= OnLogAsync;
+            _commandService.Log -= OnLogAsync;
+            
             return Task.CompletedTask;
         }
     }
