@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using Template.Data;
@@ -33,25 +35,28 @@ namespace Template
             Configuration = configBuilder.Build();
             Logger = loggerConfig.CreateLogger();
         }
-    
+
         public static async Task RunAsync(string[] args) => await new Startup().RunAsync();
 
         private async Task RunAsync()
         {
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
-
+            
             var serviceProvider = serviceCollection.BuildServiceProvider();
-
+            
             serviceProvider.GetRequiredService<CommandHandler>();
             serviceProvider.GetRequiredService<LogHandler>();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
             
-            await serviceProvider.GetRequiredService<StartupService>().StartAsync();
+            await serviceProvider.GetRequiredService<IHostedService>().StartAsync(cancellationToken);
             await serviceProvider.GetRequiredService<CommandService>().AddModulesAsync(Assembly.GetEntryAssembly(), serviceProvider);
             
-            await Task.Delay(-1);
+            await Task.Delay(-1, cancellationToken);
         }
-
+        
         private void ConfigureServices(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
@@ -66,8 +71,8 @@ namespace Template
                     DefaultRunMode = RunMode.Sync,
                     CaseSensitiveCommands = false
                 }))
+                .AddHostedService<StartupService>()
                 .ConfigureTemplateContext(Configuration["Postgre:ConnectionString"])
-                .ConfigureStartup()
                 .ConfigureCommand()
                 .ConfigureLogging()
                 .AddSingleton(Configuration)

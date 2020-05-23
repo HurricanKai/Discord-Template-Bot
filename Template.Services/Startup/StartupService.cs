@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace Template.Services.Startup
 {
-    public class StartupService
+    public class StartupService : IHostedService
     {
         private readonly DiscordSocketClient _discordSocketClient;
         private readonly IConfiguration _configuration;
@@ -19,14 +21,14 @@ namespace Template.Services.Startup
             _configuration = configuration;
             _logger = logger;
         }
-
-        public async Task StartAsync()
+        
+        public async Task StartAsync(CancellationToken cancellationToken = default)
         {
             var token = _configuration["Discord:Token"];
-
+            
             if (string.IsNullOrWhiteSpace(token))
             {
-                _logger.Fatal("The bot Token was not found at the specified location.");
+                _logger.Fatal("The bot Token was not found at in the configuration file botSettings.json");
                 return;
             }
 
@@ -37,8 +39,17 @@ namespace Template.Services.Startup
             }
             catch (Exception e)
             {
+                
                 _logger.Fatal(e.Message);
             }
+
+            await Task.Delay(-1, cancellationToken);
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            await _discordSocketClient.LogoutAsync();
+            await _discordSocketClient.StopAsync();
         }
     }
 }
