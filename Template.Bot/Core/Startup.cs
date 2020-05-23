@@ -9,7 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using Template.Data;
-using Template.Services;
+using Template.Services.Command;
+using Template.Services.Logging;
+using Template.Services.Startup;
 
 namespace Template
 {
@@ -50,9 +52,9 @@ namespace Template
             await Task.Delay(-1);
         }
 
-        private void ConfigureServices(IServiceCollection services)
+        private void ConfigureServices(IServiceCollection serviceCollection)
         {
-            services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
+            serviceCollection.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     LogLevel = LogSeverity.Verbose,
                     MessageCacheSize = 1000,
@@ -64,12 +66,17 @@ namespace Template
                     DefaultRunMode = RunMode.Sync,
                     CaseSensitiveCommands = false
                 }))
-                .AddSingleton<LogHandler>()
-                .AddSingleton<CommandHandler>()
-                .AddSingleton<StartupService>()
+                .ConfigureTemplateContext(Configuration["Postgre:ConnectionString"])
+                .ConfigureStartup()
+                .ConfigureCommand()
+                .ConfigureLogging()
                 .AddSingleton(Configuration)
-                .AddSingleton(Logger)
-                .AddDbContext<TemplateContext>(options => options.UseNpgsql(Configuration["Postgre:ConnectionString"]));
+                .AddSingleton(Logger);
+
+            foreach (var service in serviceCollection)
+            {
+                Logger.Information("Registered Service {Service}", service.ServiceType.FullName);
+            }
         }
     }
 }
