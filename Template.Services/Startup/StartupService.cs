@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace Template.Services.Startup
 {
-    public class StartupService
+    public class StartupService : IHostedService
     {
         private readonly DiscordSocketClient _discordSocketClient;
         private readonly IConfiguration _configuration;
@@ -20,7 +22,7 @@ namespace Template.Services.Startup
             _logger = logger;
         }
 
-        public async Task StartAsync()
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             var token = _configuration["Discord:Token"];
 
@@ -39,6 +41,12 @@ namespace Template.Services.Startup
             {
                 _logger.Fatal(e.Message);
             }
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            await _discordSocketClient.LogoutAsync();
+            await _discordSocketClient.StopAsync();
         }
     }
 }
