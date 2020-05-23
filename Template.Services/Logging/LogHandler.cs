@@ -4,6 +4,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Serilog;
+using Serilog.Events;
 
 namespace Template.Services.Logging
 {
@@ -13,22 +14,25 @@ namespace Template.Services.Logging
         private readonly CommandService _commandService;
         private readonly ILogger _logger;
         
-        public LogHandler(DiscordSocketClient discordSocketClient, CommandService commandService, ILogger logger)
+        public LogHandler(
+            DiscordSocketClient discordSocketClient, 
+            CommandService commandService,
+            ILogger logger)
         {
             _discordSocketClient = discordSocketClient;
             _commandService = commandService;
             _logger = logger;
 
-            _discordSocketClient.Log += OnLogAsync;
-            _commandService.Log += OnLogAsync;
+            _discordSocketClient.Log += OnLog;
+            _commandService.Log += OnLog;
         }
         
-        public Task OnLogAsync(LogMessage message)
+        public Task OnLog(LogMessage message)
         {
             switch (message.Severity)
             {
                 case LogSeverity.Critical:
-                    _logger.Fatal(message.Exception, message.Message ?? "An exception bubbled up: ");
+                    _logger.Fatal(message.Exception, message.Message);
                     break;
                 
                 case LogSeverity.Debug:
@@ -40,7 +44,7 @@ namespace Template.Services.Logging
                     break;
                 
                 case LogSeverity.Error:
-                    _logger.Error(message.Exception, message.Message ?? "An exception bubbled up: ");
+                    _logger.Error(message.Exception, message.Message);
                     break;
                 
                 case LogSeverity.Info:
