@@ -2,7 +2,7 @@
 # !! Run this script from the build directory !!
 
 cd ../*.Bot || echo 'ERROR: Could not find .Bot project.'
-NAME=""$(jq '.Build.DockerName' botSettings.json)
+NAME=$(jq '.Build.DockerName' botSettings.json)
 
 cd .. || echo 'ERROR: Dockerfile not found.'
 FILE=../Dockerfile
