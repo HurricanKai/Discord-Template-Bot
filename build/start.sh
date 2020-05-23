@@ -14,25 +14,19 @@ if [ -f "$FILE" ];
     exit
 fi
 
-#if [ "$(docker inspect -f '{{.State.Running}}' "$NAME")" == "true" ];
-  #then
-    #echo 'Stopping existing Docker containers.'
-    #docker container stop $NAME
-   # 
-  #  echo 'Removing existing Docker containers.'
- #   docker container rm $NAME
-#fi
+if [ "$(docker inspect -f '{{.State.Running}}' "$NAME")" == "true" ];
+  then
+    echo 'Stopping existing Docker containers.'
+    docker container stop $NAME
+    
+    echo 'Removing existing Docker containers.'
+    docker container rm $NAME
+fi
 
 if [ ! "$(docker ps -q -f name=$NAME)" ]; 
   then
     if [ "$(docker ps -aq -f status=exited -f name=$NAME)" ]; 
       then
-        if [ "$(docker inspect -f '{{.State.Running}}' "$NAME")" == "true" ];
-          then
-            echo 'Stopping existing Docker containers.'
-            docker container stop $NAME
-        fi
-        echo 'Removing existing Docker containers.'
         docker container rm $NAME
     fi
 fi
