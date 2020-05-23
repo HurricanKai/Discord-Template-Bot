@@ -1,10 +1,14 @@
 ﻿{
-  "Discord": {
-    "Token":"",
-    "Prefix":""
-  },
-
-  "Postgre": {
-    "ConnectionString":""
-  }
+    "Discord": {
+        "Token": "",
+        "Prefix": ""
+    },
+    
+    "Postgre": {
+        "ConnectionString": ""
+    },
+    
+    "Build": {
+        "DockerName": ""
+    }
 }
